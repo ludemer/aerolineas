@@ -1,0 +1,87 @@
+---
+- hosts: ftpar
+  become: yes
+  become_user: root
+  vars:
+    user_name01:  '{{ user_name01 }}'
+    user_name10:  '{{ user_name10 }}' 
+    group_name: '{{ user_name }}'
+    pwd01: '{{ pwd01 }}'
+    pwd10: '{{ pwd10 }}'  
+  tasks:
+  
+##################Creacion del grupo al que va a pertenecer los usuarios se coloca el user:name igual###############################################333  
+   - name: add group 
+     group: 
+       name:  '{{ user_name }}'
+       state: present 
+       
+#################Creacion de los usuarios externos y internos ###############################################       
+   - name: create user  externo for ftp
+     user:
+       name:  '{{ user_name01 }}'
+       comment: "{{ user_name01 }} Usuario externo respondable: xxx "
+       home: '/home/{{ user_name }}'
+       group: '{{ user_name }}'
+       shell: /bin/false
+       password: '{{ pswd | password_hash("sha512") }}'
+       
+   - name: create user  interno for ftp
+     user:
+       name:  '{{ user_name10 }}'
+       comment: "{{ user_name10 }} Usuario externo respondable: "
+       home: '/home/{{ user_name }}'
+       group: '{{ user_name }}'
+       shell: /bin/false
+       password: '{{ pswd | password_hash("sha512") }}'
+
+#################Creacion de permisos root.root a los directorios ftps###########3##############     
+       
+   - name: owner y group for dir
+     file:
+       path: '/home/{{ user_name }}'
+       state: directory
+       recurse: yes
+       owner: '{{ user_name }}'
+       group: '{{ user_name }}'
+       mode: '755'
+   - name: owner y group for dir
+     file:
+       path: '/home/{{ user_name }}'
+       owner: root
+       group: root
+       mode: '755'
+
+   - name: Create a directory if it does not exist
+     file:
+       path: '/home/{{ user_name }}/files'
+       state: directory
+       owner: '{{ user_name }}'
+       group: '{{ user_name }}'
+       mode: '0750'
+    
+    
+   - name: Create a directory for '{{ user_name01 }}'
+     file:
+       path: '/home/''{{ user_name }}/in'
+       state: directory
+       owner: '{{ user_name01 }}'
+       group: '{{ user_name }}'
+       mode: '0750'
+
+
+   - name: Create a directory for user  '{{ user_name10 }}'
+     file:
+       path: '/home/{{ user_name }}/out'
+       state: directory
+       owner: '{{ user_name10 }}'
+       group: '{{ user_name }}'
+       mode: '0750'
+           
+   - name: Ensure we have our own  added to /etc/sshd
+     replace: 
+       path: '/home/luis/test_sshd'
+       regexp: 'AllowUsers'
+       replace: 'AllowUsers {{ user_name }}'
+       backup: yes 
+       validate: '/usr/sbin/sshd -T -f %s'

@@ -1,0 +1,14 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  vars:
+   user: '{{ user }}'
+   pwd: '{{ pwd }}'
+  tasks:
+   - name: reset password 
+     expect: 
+       command: passwd '{{ user }}'
+       responses: 
+          password: '{{ pwd }}'
+   
