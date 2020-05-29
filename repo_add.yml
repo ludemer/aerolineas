@@ -1,0 +1,23 @@
+- hosts: all
+  become: yes
+  become_user: root
+  vars:
+  tasks: 
+    - name: copy repo in the server    
+      template: 
+         src: templates/repo_opensource.repo.j2
+         dest: /etc/zypp/repos.d/repo_opensource.repo
+     # registry: cp_repo
+
+#    - debug:
+#       vars: cp_repo
+
+    - name: update repos
+      zypper: 
+        name: '*'
+        update_cache: yes
+
+    - name: install rpm pexect
+      zypper: 
+        name: python-pexpect
+        state: present 

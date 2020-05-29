@@ -11,4 +11,3 @@
        command: passwd '{{ user }}'
        responses: 
           password: '{{ pwd }}'
-   

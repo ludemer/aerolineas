@@ -1,0 +1,26 @@
+---
+- hosts: ftpar
+  become: yes
+#  become_method: su
+  become_user: root
+  vars:
+#    user_name: "{{ option.user_name }}"
+     #   pwd01: '{ option.pswd }'
+ #   pwd10: '{ option.pwd10 }'
+ #   pswd: '1qazxsw2'
+  tasks:
+#   - name: add group
+#     group:
+#       name: '{{ item.user_name }}' 
+#       state: present
+   - name: Check option variables
+     debug: msg="Option option1 is '{{ user_name }}"
+  # - name: create user for ftp
+  #   user:
+  #     name: '{{ item.user_name }}'
+  #     comment: "usuario test ansible rundeck"
+  #     home: /home/luis
+  #     group: luis
+  #     shell: /bin/bash
+  #     password: '{{ item.pswd | password_hash("sha512") }}'
+

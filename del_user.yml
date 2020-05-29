@@ -1,0 +1,15 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  vars:
+    user_name:  '{{ user_name }}'
+  tasks:
+#################Eliminacion de usuario#########################################       
+   - name: delete  user '{{ user_name }}'  
+     user:
+       name:  '{{ user_name }}'
+       state: absent 
+       remove: yes
+     register: result 
+           

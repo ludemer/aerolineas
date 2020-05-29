@@ -1,0 +1,54 @@
+---
+- hosts: ftpar
+  become: yes
+#  become_method: su
+  become_user: root
+  vars: 
+     
+    user_name: '{{ item.name  }}'
+    pwd01: '{{ item.pwd01  }}'
+    pwd10: '{{ item.pwd10  }}'
+    pswd: '1qazxsw2'
+  tasks:
+   - name: add group 
+     group: 
+       name: luis
+       state: present 
+   - name: create user for ftp
+     user:
+       name: 'luis'
+       comment: "usuario test ansible rundeck"
+       home: /home/luis
+       group: luis
+       shell: /bin/bash
+       password: '{{ pswd | password_hash("sha512") }}'
+   - name: owner y group for dir
+     file:
+       path: /home/luis
+       state: directory
+       recurse: yes
+       owner: luis
+       group: luis
+       mode: '755'
+   - name: owner y group for dir
+     file:
+       path: /home/luis
+       owner: root
+       group: root
+       mode: '755'
+
+   - name: Create a directory if it does not exist
+     file:
+       path: /home/luis/files
+       state: directory
+       owner: luis
+       group: luis
+       mode: '0750'
+    
+   - name: Ensure we have our own  added to /etc/sshd
+     replace: 
+       path: /home/luis/test_sshd
+       regexp: 'AllowUsers'
+       replace: 'AllowUsers test_user_backup'
+       backup: yes 
+     

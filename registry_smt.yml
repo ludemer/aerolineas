@@ -1,0 +1,30 @@
+---
+- hosts:  all
+  become: yes
+  become_user: root
+#  become_method: su
+  tasks:
+    - name: create answer 
+      copy:
+        dest: /tmp/answer
+        content: | 
+          y
+          y
+    - name: reset registry in smt
+      shell:  SUSEConnect --cleanup 
+    - name: cp script for register in the SMT
+      template: 
+        src:  templates/clientSetup4SMT.sh.j2
+        dest:  /home/ansible/clientSetup4SMT.sh
+        mode: 0755
+#    - name: reset registry in smt
+#      shell: SUSEConnect --de-register
+    - name: run script
+      shell: cat /tmp/answer |  sh /home/ansible/clientSetup4SMT.sh --host 192.168.3.41
+      register: smt
+    - debug:
+        var: smt
+    - name: update patch
+      zypper: 
+        name: '*'
+        state: latest 

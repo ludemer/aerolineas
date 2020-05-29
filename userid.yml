@@ -1,0 +1,50 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  vars:
+    user_name:  '{{ user_name }}'
+    group_name: '{{ group_pame }}'
+    desc: '{{ desc }}'
+    pwd: '{{ pwd }}'
+    uid: '{{ uid }}'
+  tasks:
+#################Creacion de los usuarios externos y internos ###############################################       
+   - name: create  user '{{ user_name }}'  
+     user:
+       name:  '{{ user_name }}'
+       comment: "{{ desc }}"
+       uid: '{{ uid }}'
+       home: '/home/{{ user_name }}'
+       group: '{{ group_name }}'
+       shell: /bin/bash
+       generate_ssh_key: yes
+       ssh_key_file: .ssh/id_rsa_{{ user_name }}
+       password: '{{ pwd | password_hash("sha512") }}'
+     register: result
+   #  ignore_errors: True 
+
+   - name: create file authorized_keys
+     file: 
+       path: /home/{{ user_name }}/.ssh/authorized_keys
+       state: touch
+       mode: '0644'
+    # ignore_errors: True
+
+   - name: create file authorized_keys
+     file:
+       path: '/home/{{ user_name }}/.ssh/id_rsa_{{ user_name }}'
+       mode: '0600'
+     #ignore_errors: True
+
+   - name: chmod 640 in id_rsa.pu
+     file:
+       path: '/home/{{ user_name }}/.ssh/id_rsa_{{ user_name }}.pub'
+       mode: '0640'
+     #ignore_errors: True
+
+ #  - name: La creacion del usuario  
+  #   fail: 	
+   #    msg: El UID ya exite por favor coloque otro 
+    # when: "result.rc == 4"
+     #ignore_errors: True

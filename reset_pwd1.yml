@@ -1,7 +1,7 @@
 ---
 - hosts: all
   become: yes
-  become_method: sudo
+  become_user: root
   vars:
     user: '{{ user }}'
     pwd: '{{ pwd }}'
@@ -11,13 +11,25 @@
     register: user_exists
     ignore_errors: true
 
-  - name: Update password user sa
+#  - debug:
+#      #msg: '{{ user_exist }}'
+#      var: '{{ user }}'
+
+#  - debug: 
+#      #msg: '{{ user_exist }}'
+#      var: user_exists
+
+  - name: Update password user
     user:
       name: '{{ user }}'
-      password: '{{ pwd | password_hash("sha512") }}'
+      password: '{{ pwd | password_hash("sha512") }}' 
       update_password: always
     when: user_exists.rc == 0
 
+  - name: Changing user password '{{ user }}'
+    debug: 
+      msg: Password changed please login to the server.....
+    when: user_exists.rc == 0 
   - debug:
-      msg: User already exists
+      msg: User does not exists, please verify the name.....
     when: user_exists.rc != 0
